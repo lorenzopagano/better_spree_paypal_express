@@ -33,7 +33,7 @@ module Spree
         if pp_response.success?
           redirect_to provider.express_checkout_url(pp_response, useraction: 'commit')
         else
-          flash[:error] = Spree.t('flash.generic_error', scope: 'paypal', reasons: pp_response.errors.map(&:long_message).join(" "))
+          flash[:error] = Spree.t('flash.generic_error', scope: 'paypal', reasons: pp_response.errors.map(&:long_message).join(' '))
           redirect_to checkout_state_path(:payment)
         end
       rescue SocketError
@@ -80,22 +80,24 @@ module Spree
               currencyID: item.order.currency,
               value: item.price
           },
-          ItemCategory: "Physical"
+          ItemCategory: 'Physical'
       }
     end
 
     def express_checkout_request_details order, items
-      { SetExpressCheckoutRequestDetails: {
+      { 
+        SetExpressCheckoutRequestDetails: {
           InvoiceID: order.number,
           BuyerEmail: order.email,
           ReturnURL: confirm_paypal_url(payment_method_id: params[:payment_method_id], utm_nooverride: 1),
           CancelURL:  cancel_paypal_url,
-          SolutionType: payment_method.preferred_solution.present? ? payment_method.preferred_solution : "Mark",
-          LandingPage: payment_method.preferred_landing_page.present? ? payment_method.preferred_landing_page : "Billing",
-          cppheaderimage: payment_method.preferred_logourl.present? ? payment_method.preferred_logourl : "",
+          SolutionType: payment_method.preferred_solution.present? ? payment_method.preferred_solution : 'Mark',
+          LandingPage: payment_method.preferred_landing_page.present? ? payment_method.preferred_landing_page : 'Billing',
+          cppheaderimage: payment_method.preferred_logourl.present? ? payment_method.preferred_logourl : '',
           NoShipping: 1,
-          PaymentDetails: [payment_details(items)]
-      }}
+          PaymentDetails: [ payment_details(items) ]
+        }
+      }
     end
 
     def payment_method
@@ -145,15 +147,15 @@ module Spree
           },
           ShipToAddress: address_options,
           PaymentDetailsItem: items,
-          ShippingMethod: "Shipping Method Name Goes Here",
-          PaymentAction: "Sale"
+          ShippingMethod: 'Shipping Method Name Goes Here',
+          PaymentAction: 'Sale'
         }
       end
     end
 
     def address_options
       return {} unless address_required?
-
+      
       {
           Name: current_order.bill_address.try(:full_name),
           Street1: current_order.bill_address.address1,
